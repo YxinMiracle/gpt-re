@@ -1,3 +1,4 @@
 .idea
 target/
 huawei_data_process/huawei_json/
+**/__pychache__/
