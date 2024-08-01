@@ -31,6 +31,7 @@ def build_find_tuned_re_model_input_data(knn_obj: KnnRetrievalTemplate):
         #
         head_entity = single_sent.head_entity  # type: Entity
         tail_entity = single_sent.tail_entity  # type: Entity
+        print(1123123)
 
         print(head_entity.entity_type, head_entity.entity_name)
         print(tail_entity.entity_type, tail_entity.entity_name)
