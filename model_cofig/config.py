@@ -6,12 +6,17 @@ RELATION_NAME_LIST = ['resolves-to', 'beacons-to', 'exploits', 'targets', 'uses'
                       'downloads', 'hosts', 'authored-by', 'compromises', 'variant-of', 'attributed-to', 'located-at',
                       'owns']
 
+RECONSTRUCTED_BASE_SENT = "The relation between \"{head_entity}\" and \"{tail_entity}\" in the context: \"{input_sent}\""
+
 
 def get_params():
     # parse parameters
     parser = argparse.ArgumentParser(description="YxinMiracle RE")
     parser.add_argument("--bert_model_name", type=str, default="bert-base-cased",
                         help="model name (e.g., bert-base-cased, roberta-base)")
+    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
+    parser.add_argument("--epoch", type=int, default=60, help="Number of epoch")
+    parser.add_argument("--shuffle", type=bool, default=True)
     params = parser.parse_args()
     return params
 
