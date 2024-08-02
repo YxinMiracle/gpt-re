@@ -1,9 +1,11 @@
 import os
 import json
 
+from spacy.lang.el.tokenizer_exceptions import token
+
 from huawei_data_process.config import cti_labelId_2_labelName_dict
 from process_model.Entity import Entity
-from process_model.Re_Base_Data import ReBaseData
+from process_model.ReBaseData import ReSentBaseData
 
 
 # 获取文件夹下面的所有文件
@@ -199,18 +201,20 @@ def build_re_task_data(s_entity_id, e_entity_id, relation_type, sentences_data):
             end_id = start_node_sentence_id_in_sentence
 
         sent_str = " ".join(sentences_data[start_id]["tokens"]) + " " + " ".join(sentences_data[end_id]["tokens"])
+        token_list = sentences_data[start_id]["tokens"] + sentences_data[end_id]["tokens"]
         # print(
         #     f"句子为：{sent_str}\n需要判断的实体类型为如下:\n头节点名称:{s_entity_information[1]}头节点类型:{s_entity_information[0]}。\n尾节点名称: {e_entity_information[1]} 尾节点类型:{e_entity_information[0]}\n他们的关系类型为：{relation_type}")
         # print("====================================================================")
     else:
         sent_str = " ".join(sentences_data[start_node_sentence_id_in_sentence]["tokens"])
+        token_list = sentences_data[start_node_sentence_id_in_sentence]["tokens"]
         # print(
         #     f"句子为：{sent_str}\n需要判断的实体类型为如下:\n头节点名称:{s_entity_information[1]}头节点类型:{s_entity_information[0]}。\n尾节点名称: {e_entity_information[1]} 尾节点类型:{e_entity_information[0]}\n他们的关系类型为：{relation_type}")
         # print("===================================================================")
     head_entity = Entity(entity_name=s_entity_information[1], entity_type=s_entity_information[0])
     tail_entity = Entity(entity_name=e_entity_information[1], entity_type=e_entity_information[0])
-    re_base_data = ReBaseData(sent=sent_str, head_entity=head_entity, tail_entity=tail_entity,
-                              relation_type=relation_type)
+    re_base_data = ReSentBaseData(sent=sent_str, head_entity=head_entity, tail_entity=tail_entity,
+                              relation_type=relation_type,sent_token_list=token_list)
     return re_base_data
 
 # 这是两个实体都在一个句子里面

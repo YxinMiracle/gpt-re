@@ -2,11 +2,9 @@ from typing import List
 import os
 
 from huawei_data_process.process_json_data import process_file
-from process_model.KnnRetrievalTemplate import KnnRetrievalTemplate
-from process_model.Re_Base_Data import ReBaseData
-from model_pre_data_process.re_model_data_process import build_find_tuned_re_model_input_data
+from process_model.KnnRetrievalTask import KnnRetrievalTemplate
+from process_model.ReBaseData import ReSentBaseData
 import json
-
 
 
 def get_file_full_path_list_in_directory(directory_name: str) -> List[str]:
@@ -23,7 +21,7 @@ def get_file_full_path_list_in_directory(directory_name: str) -> List[str]:
     return files
 
 
-def get_article_re_task_data(file_path: str, file_id: int) -> List[ReBaseData]:
+def get_article_re_task_data(file_path: str, file_id: int) -> List[ReSentBaseData]:
     """
     返回一个文章中所有的能进行关系抽取的句子，会出现有跨句的情况
     :param file_path:
@@ -33,17 +31,16 @@ def get_article_re_task_data(file_path: str, file_id: int) -> List[ReBaseData]:
     file_data = {}  # type: dict
     with open(file_path, "r", encoding="UTF-8") as fp:
         file_data = json.load(fp)
-    article_re_task_res = process_file(file_data, file_id)  # type:List[ReBaseData]
+    article_re_task_res = process_file(file_data, file_id)  # type:List[ReSentBaseData]
     return article_re_task_res
 
 
 if __name__ == '__main__':
     input_dir_name = "./huawei_data_process/huawei_json"
     file_list = get_file_full_path_list_in_directory(input_dir_name)
-    total_re_task_data_list = [] # type:List[ReBaseData]
+    total_re_task_data_list = []  # type:List[ReSentBaseData]
     for file_id, file_name in enumerate(file_list):
-        article_re_task_res = get_article_re_task_data(file_name, file_id)  # type:List[ReBaseData]
+        article_re_task_res = get_article_re_task_data(file_name, file_id)  # type:List[ReSentBaseData]
         if len(article_re_task_res) == 0: continue
         total_re_task_data_list.extend(article_re_task_res)
-    knn_task_obj = KnnRetrievalTemplate(total_re_task_data_list)
-    build_find_tuned_re_model_input_data(knn_task_obj)
+    knn_task_obj = KnnRetrievalTemplate(total_re_task_data_list)  # 这里存放的是所有数据集中需要进行关系抽取的句子
