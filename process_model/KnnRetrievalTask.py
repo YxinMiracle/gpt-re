@@ -10,7 +10,8 @@ from transformers import AutoTokenizer
 
 params = get_params()
 
-auto_tokenizer = AutoTokenizer.from_pretrained(params.model_name, local_files_only=True)
+
+auto_tokenizer = AutoTokenizer.from_pretrained(params.bert_model_name, local_files_only=True)
 pad_token_label_id = nn.CrossEntropyLoss().ignore_index
 
 
@@ -20,7 +21,7 @@ class KnnRetrievalTemplate:
         self.source_data_list = source_data_list  # type:List[ReSentBaseData]
         # self.relation_name_list = self.get_relation_name_list() # type:List[str]
         # 1. 数据预处理，将所有单词和标签转为对应的id形式，方便模型进行输入
-        self.do_pre_data_for_re_model()
+        # self.do_pre_data_for_re_model()
 
     def get_relation_name_list(self) -> List[str]:
         """

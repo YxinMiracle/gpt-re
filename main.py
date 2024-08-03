@@ -5,8 +5,18 @@ from huawei_data_process.process_json_data import process_file
 from process_model.KnnRetrievalTask import KnnRetrievalTemplate
 from process_model.ReBaseData import ReSentBaseData
 from process_model.PreDataProcess import ProcessTrainDataTemplate
+from model_cofig.config import get_params
 import json
+import torch
+import random
+import numpy as np
 
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 def get_file_full_path_list_in_directory(directory_name: str) -> List[str]:
     """
@@ -29,7 +39,6 @@ def get_article_re_task_data(file_path: str, file_id: int) -> List[ReSentBaseDat
     :param file_id:
     :return:
     """
-    file_data = {}  # type: dict
     with open(file_path, "r", encoding="UTF-8") as fp:
         file_data = json.load(fp)
     article_re_task_res = process_file(file_data, file_id)  # type:List[ReSentBaseData]
@@ -45,7 +54,8 @@ if __name__ == '__main__':
         if len(article_re_task_res) == 0: continue
         total_re_task_data_list.extend(article_re_task_res)
     # ==== 这里已经获得到了所有的句子以及对应的句子里面存在的实体和关系  ======
-
+    params = get_params()
+    set_seed(params.seed)
     knn_task_obj = KnnRetrievalTemplate(total_re_task_data_list)  # 这里存放的是所有数据集中需要进行关系抽取的句子
-    p_obj = ProcessTrainDataTemplate(total_re_task_data_list)
+    p_obj = ProcessTrainDataTemplate(total_re_task_data_list,params)
     p_obj.do_process()

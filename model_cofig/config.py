@@ -1,11 +1,5 @@
 import argparse
 
-# 关系抽取任务的所有关系枚举
-RELATION_NAME_LIST = ['resolves-to', 'beacons-to', 'exploits', 'targets', 'uses', 'delivers', 'originates-from',
-                      'consists-of', 'hashes-to', 'drops', 'alias-of', 'communicates-with', 'controls', 'has',
-                      'downloads', 'hosts', 'authored-by', 'compromises', 'variant-of', 'attributed-to', 'located-at',
-                      'owns']
-
 RECONSTRUCTED_BASE_SENT = "The relation between \"{head_entity}\" and \"{tail_entity}\" in the context: \"{input_sent}\""
 
 
@@ -14,9 +8,13 @@ def get_params():
     parser = argparse.ArgumentParser(description="YxinMiracle RE")
     parser.add_argument("--bert_model_name", type=str, default="bert-base-cased",
                         help="model name (e.g., bert-base-cased, roberta-base)")
+    parser.add_argument("--data_directory_name", type=str, default="data", help="data directory name")
+    parser.add_argument("--ner2idx_file_name", type=str, default="ner2idx.json", help="ner2idx file name")
+    parser.add_argument("--re2idx_file_name", type=str, default="rel2idx.json", help="re2idx file name")
     parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
     parser.add_argument("--epoch", type=int, default=60, help="Number of epoch")
     parser.add_argument("--shuffle", type=bool, default=True)
+    parser.add_argument("--seed", default=7777, type=int)
     params = parser.parse_args()
     return params
 

@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from transformers import AutoTokenizer
 
-from model_cofig.config import get_params, RELATION_NAME_LIST
+from model_cofig.config import get_params
 from process_model.Entity import Entity
 from process_model.EntityTypeEnum import EntityType
 from process_model.ReBaseData import ReSentBaseData
@@ -27,14 +27,17 @@ def get_head_tail_entities_index_in_sent(sent_token_list: List[str],
     :return: 头实体和尾实体的起始索引组成的元组
     """
 
-    def find_sublist_indices(main_list: List[str], sublist: List[str]) -> List[int]:
+    def find_sublist_indices(main_list: List[str], sublist: List[str]) -> List[List[int]]:
         """查找子列表在主列表中的所有连续出现位置的起始索引"""
         sublist_len = len(sublist)
-        return [i for i in range(len(main_list) - sublist_len + 1)
-                if main_list[i:i + sublist_len] == sublist]
+        res_list = []  # type: List[List[int]]
+        for i in range(len(main_list) - sublist_len + 1):
+            if main_list[i:i + sublist_len] == sublist:
+                res_list.append([index for index in range(i, i + sublist_len + 1)])
+        return res_list
 
-    head_entity_index_in_sent = find_sublist_indices(sent_token_list, head_entity_list)
-    tail_entity_index_in_sent = find_sublist_indices(sent_token_list, tail_entity_list)
+    head_entity_index_in_sent = find_sublist_indices(sent_token_list, head_entity_list)  # type: List[List[int]]
+    tail_entity_index_in_sent = find_sublist_indices(sent_token_list, tail_entity_list)  # type: List[List[int]]
 
     return head_entity_index_in_sent, tail_entity_index_in_sent
 
