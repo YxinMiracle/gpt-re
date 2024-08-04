@@ -1,7 +1,5 @@
-import os
 import json
-
-from spacy.lang.el.tokenizer_exceptions import token
+import os
 
 from huawei_data_process.config import cti_labelId_2_labelName_dict
 from process_model.Entity import Entity
@@ -214,8 +212,9 @@ def build_re_task_data(s_entity_id, e_entity_id, relation_type, sentences_data):
     head_entity = Entity(entity_name=s_entity_information[1], entity_type=s_entity_information[0])
     tail_entity = Entity(entity_name=e_entity_information[1], entity_type=e_entity_information[0])
     re_base_data = ReSentBaseData(sent=sent_str, head_entity=head_entity, tail_entity=tail_entity,
-                              relation_type=relation_type,sent_token_list=token_list)
+                                  relation_type=relation_type, sent_token_list=token_list)
     return re_base_data
+
 
 # 这是两个实体都在一个句子里面
 def process_file(cti_json_data: dict, index):

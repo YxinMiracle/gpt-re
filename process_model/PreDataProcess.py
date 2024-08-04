@@ -1,14 +1,13 @@
 # 数据预处理模板类，用户适配PFN Model
+import json
+import logging
+import os
+import pathlib
+import random
 from argparse import ArgumentParser
 from typing import List, Tuple
 
-
 from process_model.ReBaseData import ReSentBaseData
-import logging
-import pathlib
-import os
-import json
-import random
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -20,6 +19,8 @@ class ProcessTrainDataTemplate:
     def __init__(self, data: List[ReSentBaseData], params: ArgumentParser):
         self.sent_data_list = data  # type: List[ReSentBaseData]
         self.params = params  # type: ArgumentParser
+        self.root_dir = str(pathlib.Path(__file__).resolve().parent.parent)  # type: str
+        self.data_directory_path = self.root_dir + os.path.sep + self.params.data_directory_name
 
     # 构建实体和关系数据，都是模型所需要的
     def save_ner_and_re_idx_json_data(self):
@@ -28,14 +29,12 @@ class ProcessTrainDataTemplate:
         :return:
         """
         logging.info("开始处理实体与关系idx数据")
-        root_dir = str(pathlib.Path(__file__).resolve().parent.parent)  # type: str
 
-        data_directory_path = root_dir + os.path.sep + self.params.data_directory_name
-        if not os.path.exists(data_directory_path):
-            os.makedirs(data_directory_path)
+        if not os.path.exists(self.data_directory_path):
+            os.makedirs(self.data_directory_path)
 
-        ner2idx_file_name = data_directory_path + os.path.sep + self.params.ner2idx_file_name  # type: str
-        rel2idx_file_name = data_directory_path + os.path.sep + self.params.re2idx_file_name  # type: str
+        ner2idx_file_name = self.data_directory_path + os.path.sep + self.params.ner2idx_file_name  # type: str
+        rel2idx_file_name = self.data_directory_path + os.path.sep + self.params.re2idx_file_name  # type: str
         if os.path.exists(ner2idx_file_name) and os.path.exists(rel2idx_file_name):
             # 如果两个文件都有了，那就不往下继续了
             logging.info("index文件已存在，不需要继续执行")
@@ -49,8 +48,8 @@ class ProcessTrainDataTemplate:
         rel2idx_dict = {relation_type: index for index, relation_type in
                         enumerate(list(relation_type_set))}  # type: dict
 
-        json.dump(ner2idx_dict, open(f"{data_directory_path + os.path.sep}ner2idx.json", "w"))
-        json.dump(rel2idx_dict, open(f"{data_directory_path + os.path.sep}rel2idx.json", "w"))
+        json.dump(ner2idx_dict, open(ner2idx_file_name, "w"))
+        json.dump(rel2idx_dict, open(rel2idx_file_name, "w"))
         logging.info("完成idx数据预准备")
 
     def get_head_tail_entities_index_in_sent(self, sent_token_list: List[str],
@@ -79,9 +78,19 @@ class ProcessTrainDataTemplate:
         return head_entity_index_in_sent, tail_entity_index_in_sent
 
     def save_sent_ner_re_json_data(self):
+        logging.info("开始处理训练数据和测试数据")
+        if not os.path.exists(self.data_directory_path):
+            os.makedirs(self.data_directory_path)
+
+        train_file_path = self.data_directory_path + os.path.sep + self.params.train_file_name  # type: str
+        test_file_path = self.data_directory_path + os.path.sep + self.params.test_file_name  # type: str
+        if os.path.exists(train_file_path) and os.path.exists(test_file_path):
+            # 如果两个文件都有了，那就不往下继续了
+            logging.info("训练数据和测试数据文件已存在，不需要继续执行")
+            return
         total_data_list = []  # type: List[dict]
         for sent_data in self.sent_data_list:
-            sent_dict = {}
+            sent_dict = {}  # type: dict
             sent_dict["tokens"] = sent_data.fine_tuned_re_model_tokens
             head_entity_index_in_sent, tail_entity_index_in_sent = self.get_head_tail_entities_index_in_sent(
                 sent_token_list=sent_data.fine_tuned_re_model_tokens,
@@ -112,7 +121,14 @@ class ProcessTrainDataTemplate:
             sent_dict["relations"] = relation_list
             total_data_list.append(sent_dict)
         random.shuffle(total_data_list)
+        split = int(0.15 * len(total_data_list))
+        train_data = total_data_list[split:]  # type: list[dict]
+        test_data = total_data_list[:split]  # type: list[dict]
 
+        # 保存文件
+        json.dump(train_data, open(train_file_path, "w"))
+        json.dump(test_data, open(test_file_path, "w"))
+        logging.info("训练数据已保存在{}和测试数据已保存在{}".format(train_file_path, test_file_path))
 
     def do_process(self):
         # 第一步，构建训练所需要的idx文件

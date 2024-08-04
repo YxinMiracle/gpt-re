@@ -1,15 +1,12 @@
 from typing import List
-import torch.utils.data as data
+
 import torch.nn as nn
-from model_cofig.config import get_params
-from model_pre_data_process.re_model_data_process_utils import build_fine_tuned_re_model_input_data
-from process_model.ReBaseData import ReSentBaseData
-from torch.utils.data import DataLoader
-import torch
 from transformers import AutoTokenizer
 
-params = get_params()
+from model_cofig.config import get_params
+from process_model.ReBaseData import ReSentBaseData
 
+params = get_params()
 
 auto_tokenizer = AutoTokenizer.from_pretrained(params.bert_model_name, local_files_only=True)
 pad_token_label_id = nn.CrossEntropyLoss().ignore_index

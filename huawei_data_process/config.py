@@ -9,6 +9,7 @@ def process_label_data(cti_json_data: dict) -> dict:
             if label_id not in cti_labelId_2_labelName_dict: cti_labelId_2_labelName_dict[label_id] = label_name
     return cti_labelId_2_labelName_dict
 
+
 cti_labelId_2_labelName_dict = {'hvYZEVXqY-5n7mGpZJSoA': 'alias-of', 'BYQTBBa8R9lhnxMoC4pWU': 'attributed-to',
                                 'wQpnRB0AH5erd8PdLhr1W': 'authored-by', 'P9kjLuxfz-pcHaH575FCA': 'beacons-to',
                                 'n9uBZ_dqAcOuOYRzdfZ2P': 'communicates-with', 'MHNOa0ndul3ko5HokEidM': 'compromises',
