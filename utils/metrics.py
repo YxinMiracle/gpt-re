@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class micro():
+class EvalMicro():
     def __init__(self, rel2idx, ner2idx):
         self.rel2idx = rel2idx
         self.ner2idx = ner2idx
@@ -65,7 +65,7 @@ class micro():
         return [ner_pred_num, ner_gold_num, ner_right_num]
 
 
-class macro():
+class EvalMacro():
     def __init__(self, rel2idx, ner2idx):
         self.rel2idx = rel2idx
         self.ner2idx = ner2idx
@@ -139,7 +139,7 @@ class macro():
         return entity_num_list
 
 
-def f1(num):
+def get_f1(num):
     results = {}
     results["p"], results["r"], results["f"] = 0, 0, 0
     type_num = len(num) / 3
@@ -169,9 +169,9 @@ def f1(num):
     return results
 
 
-class LossClass(nn.Module):
+class LossBase(nn.Module):
     def __init__(self):
-        super(LossClass, self).__init__()
+        super(LossBase, self).__init__()
         self.loss_ner = nn.BCELoss(reduction='sum')
         self.loss_re = nn.BCELoss(reduction='sum')
 

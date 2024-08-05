@@ -84,27 +84,35 @@ class collater():
         return [words, ner_labels, rc_labels, mask]
 
 
-class save_results(object):
-    def __init__(self, filename, header=None):
-        self.filename = filename
-        if os.path.exists(filename):
-            os.remove(filename)
+class SaveResults(object):
+    def __init__(self, filepath: str, filename: str, header=None):
+        """
+        之所以分开两个是因为我们可以先根据filepath去判断系统中是否存在这个路径，要是不存在的话可以先进行创建
+        :param filepath:
+        :param filename:
+        :param header:
+        """
+        self.filepath = filepath
+        if not os.path.exists(self.filepath):
+            os.makedirs(self.filepath)
+
+        self.filename_by_fullpath = self.filepath + os.path.sep + filename
+        if os.path.exists(self.filename_by_fullpath):
+            os.remove(self.filename_by_fullpath)
 
         if header is not None:
-            with open(filename, 'w') as out:
+            with open(self.filename_by_fullpath, 'w') as out:
                 print(header, file=out)
 
     def save(self, info):
-        with open(self.filename, 'a') as out:
+        with open(self.filename_by_fullpath, 'a') as out:
             print(info, file=out)
 
+    def map_to_idx(text, word2idx):
+        ids = [word2idx[t] if t in word2idx else 1 for t in text]
+        return ids
 
-def map_to_idx(text, word2idx):
-    ids = [word2idx[t] if t in word2idx else 1 for t in text]
-    return ids
-
-
-def is_overlap(ent1, ent2):
-    if ent1[1] < ent2[0] or ent2[1] < ent1[0]:
-        return False
-    return True
+    def is_overlap(ent1, ent2):
+        if ent1[1] < ent2[0] or ent2[1] < ent1[0]:
+            return False
+        return True

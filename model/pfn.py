@@ -225,10 +225,10 @@ class re_unit(nn.Module):
 
 
 class PFN(nn.Module):
-    def __init__(self, args, input_size, ner2idx, rel2idx):
+    def __init__(self, args, ner2idx, rel2idx):
         super(PFN, self).__init__()
         self.args = args
-        self.feature_extractor = encoder(args, input_size)
+        self.feature_extractor = encoder(args, 768)
 
         self.ner = ner_unit(args, ner2idx)
         self.re = re_unit(args, rel2idx)

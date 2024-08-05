@@ -108,7 +108,7 @@ def data_preprocess(data):
     return processed
 
 
-def dataloader(project_root_path: str, params: ArgumentParser, ner2idx: dict, rel2idx: dict):
+def get_train_dataloader(project_root_path: str, params: ArgumentParser, ner2idx: dict, rel2idx: dict):
     path = project_root_path + os.path.sep + params.data_directory_name + os.path.sep
 
     train_raw_data = json_load(path, params.train_file_name)

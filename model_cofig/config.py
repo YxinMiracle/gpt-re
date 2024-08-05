@@ -13,6 +13,8 @@ def get_params():
     parser.add_argument("--ner2idx_file_name", type=str, default="ner2idx.json", help="ner2idx file name")
     parser.add_argument("--re2idx_file_name", type=str, default="rel2idx.json", help="re2idx file name")
     parser.add_argument("--shuffle", type=bool, default=True)
+    parser.add_argument("--saved_mode_name", type=str, default="model.pt")
+    parser.add_argument("--train_log_file_name", type=str, default="train.log")
     parser.add_argument("--seed", default=7777, type=int)
     parser.add_argument("--train_file_name", default="train_triples.json", type=str, help="the file name of train data")
     parser.add_argument("--test_file_name", default="test_triples.json", type=str, help="the file name of test data")
