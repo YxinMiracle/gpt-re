@@ -16,14 +16,28 @@ class ReSentBaseData:
         :param relation_type:
         :param sent_token_list:
         """
-        self.sent = sent
-        self.head_entity = head_entity
-        self.tail_entity = tail_entity
-        self.relation_type = relation_type
-        self.sent_token_list = sent_token_list
-        self.reconstructed_sent = self._reconstructed_sent()
-        self.fine_tuned_re_model_tokens = self._get_reconstruct_sent_token_list()
-        self.can_use = False
+        self.sent = sent # type: str
+        self.head_entity = head_entity # type: Entity
+        self.tail_entity = tail_entity # type: Entity
+        self.relation_type = relation_type # type: str
+        self.sent_token_list = sent_token_list # type: List[str]
+        self.reconstructed_sent = self._reconstructed_sent() # type: str
+        self.fine_tuned_re_model_tokens = self._get_reconstruct_sent_token_list() # type: List[str]
+
+    def to_dict(self) -> dict:
+        return {
+            'sent': self.sent,
+            'head_entity': self.head_entity.to_dict(),
+            'tail_entity': self.tail_entity.to_dict(),
+            'relation_type': self.relation_type,
+            'sent_token_list': self.sent_token_list,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        head_entity = Entity.from_dict(data['head_entity'])
+        tail_entity = Entity.from_dict(data['tail_entity'])
+        return ReSentBaseData(data['sent'], head_entity, tail_entity, data['relation_type'], data['sent_token_list'])
 
     def _get_reconstruct_sent_token_list(self) -> List[str]:
         reconstruct_sent_token_list = []
