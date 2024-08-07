@@ -1,7 +1,7 @@
 from typing import List
 
 from model_cofig.config import RECONSTRUCTED_BASE_SENT
-from process_model.Entity import Entity
+from process_model.model.Entity import Entity
 
 
 # 用作存储re任务的从文章中抽出出来的基本格式，单位为一个句子一个对象

@@ -2,8 +2,8 @@ import json
 import os
 
 from huawei_data_process.config import cti_labelId_2_labelName_dict
-from process_model.Entity import Entity
-from process_model.ReBaseData import ReSentBaseData
+from process_model.model.Entity import Entity
+from process_model.model.ReBaseData import ReSentBaseData
 
 
 # 获取文件夹下面的所有文件

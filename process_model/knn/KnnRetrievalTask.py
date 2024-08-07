@@ -1,12 +1,11 @@
 import pathlib
 from typing import List
 import json
-import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
 import os
 from model.pfn import PFN
-from model_cofig.config import get_params
-from process_model.ReBaseData import ReSentBaseData
+from process_model.knn.KnnResultVo import IdentifiedReSentBaseData
+from process_model.model.ReBaseData import ReSentBaseData
 import torch
 import h5py
 import numpy as np
@@ -120,7 +119,7 @@ class KnnRetrievalTemplate:
         logger.info("knn所需数据获取成功")
         self.knn_model, self.stored_sentences = self._init_knn_model()
 
-    def find_sent(self, sent_data: ReSentBaseData) -> List[ReSentBaseData]:
+    def find_sent(self, sent_data: ReSentBaseData) -> List[IdentifiedReSentBaseData]:
         # 需要两个数据，一个是关系句子，还有一个重构句子
         reconstructed_sent = sent_data.reconstructed_sent
         logger.info("重构句子已获取成功，句子为：{}".format(reconstructed_sent))
@@ -133,15 +132,21 @@ class KnnRetrievalTemplate:
 
         distances, indices = self.knn_model.kneighbors(final_embedding.detach().numpy().reshape(1, -1))
 
-        ret_list = []  # type: List[ReSentBaseData]
+        ret_list = []  # type: List[IdentifiedReSentBaseData]
         for index in indices[0]:
             data = json.loads(self.stored_sentences[index].decode('utf-8'))
             restored_sentence_data = ReSentBaseData.from_dict(data)
-            ret_list.append(restored_sentence_data)
+            irsb_obj = IdentifiedReSentBaseData(restored_sentence_data.sent,
+                                                restored_sentence_data.head_entity,
+                                                restored_sentence_data.tail_entity,
+                                                restored_sentence_data.relation_type,
+                                                restored_sentence_data.sent_token_list,
+                                                id=index)
+            ret_list.append(irsb_obj)
 
         return ret_list
 
-    def do_find_similar_sent(self, sent_data: ReSentBaseData) -> List[ReSentBaseData]:
+    def do_find_similar_sent(self, sent_data: ReSentBaseData) -> List[IdentifiedReSentBaseData]:
         if not os.path.exists(self.knn_model_data):
             self.save_sent_embedding_list()
-        return self.find_sent(sent_data)  # type: List[ReSentBaseData]
+        return self.find_sent(sent_data)  # type: List[IdentifiedReSentBaseData]
