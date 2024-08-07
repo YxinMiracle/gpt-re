@@ -7,7 +7,7 @@ import random
 from argparse import ArgumentParser
 from typing import List, Tuple
 
-from process_model.ReBaseData import ReSentBaseData
+from process_model.model.ReBaseData import ReSentBaseData
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',

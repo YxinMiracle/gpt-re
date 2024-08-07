@@ -199,9 +199,9 @@ class re_unit(nn.Module):
         length, batch_size, _ = h_re.size()
 
         h_global = torch.cat((h_share, h_re), dim=-1)
-        h_global = torch.tanh(self.r(h_global))
+        re_global = torch.tanh(self.r(h_global))
 
-        h_global = torch.max(h_global, dim=0)[0]
+        h_global = torch.max(re_global, dim=0)[0]
         h_global = h_global.unsqueeze(0).repeat(length, 1, 1)
         h_global = h_global.unsqueeze(0).repeat(length, 1, 1, 1)
 
@@ -221,18 +221,18 @@ class re_unit(nn.Module):
 
         re = re * mask
 
-        return re
+        return re, re_global
 
 
 class PFN(nn.Module):
     def __init__(self, args, ner2idx, rel2idx):
         super(PFN, self).__init__()
         self.args = args
-        self.feature_extractor = encoder(args, 768)
+        self.feature_extractor = encoder(self.args, self.args.input_size)
 
-        self.ner = ner_unit(args, ner2idx)
-        self.re = re_unit(args, rel2idx)
-        self.dropout = nn.Dropout(args.dropout)
+        self.ner = ner_unit(self.args, ner2idx)
+        self.re = re_unit(self.args, rel2idx)
+        self.dropout = nn.Dropout(self.args.dropout)
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
         self.bert = AutoModel.from_pretrained("bert-base-cased")
 
@@ -249,5 +249,5 @@ class PFN(nn.Module):
         h_ner, h_re, h_share = self.feature_extractor(x)
 
         ner_score = self.ner(h_ner, h_share, mask)
-        re_core = self.re(h_re, h_share, mask)
-        return ner_score, re_core
+        re_core, re_global = self.re(h_re, h_share, mask)
+        return ner_score, re_core, re_global

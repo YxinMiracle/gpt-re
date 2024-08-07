@@ -71,7 +71,7 @@ class BaseTrainer:
                 re_label = data[2].cuda()
                 mask = data[-1].cuda()
 
-                ner_pred, re_pred = self.model(text, mask)
+                ner_pred, re_pred, _ = self.model(text, mask)
                 loss = self.loss_fn(ner_pred, ner_label, re_pred, re_label)
                 test_loss += loss
 
@@ -106,7 +106,7 @@ class BaseTrainer:
         ner_label = data[1].cuda()
         re_label = data[2].cuda()
         mask = data[-1].cuda()
-        ner_pred, re_pred = self.model(text, mask)
+        ner_pred, re_pred, _ = self.model(text, mask)
         loss = self.loss_fn(ner_pred, ner_label, re_pred, re_label)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(parameters=self.model.parameters(), max_norm=self.params.clip)

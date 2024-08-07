@@ -4,14 +4,16 @@ from argparse import ArgumentParser
 from typing import List
 
 import numpy as np
-
-from huawei_data_process.process_json_data import process_file
 from model.dataloader.dataloader import get_train_dataloader
 from model.pfn import PFN
 from model.trainer.baseTrainer import BaseTrainer
+
+from huawei_data_process.process_json_data import process_file
 from model_cofig.config import get_params
-from process_model.PreDataProcess import ProcessTrainDataTemplate
-from process_model.ReBaseData import ReSentBaseData
+from process_model.knn.KnnResultVo import IdentifiedReSentBaseData
+from process_model.model.ReBaseData import ReSentBaseData
+from process_model.knn.KnnRetrievalTask import KnnRetrievalTemplate
+from process_model.SearchByLLM import LLM_RE
 from utils.helper import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -93,7 +95,16 @@ if __name__ == '__main__':
     params = get_params()
     set_seed(params.seed)
     """ 处理成模型所需形式 """
-    p_obj = ProcessTrainDataTemplate(total_re_task_data_list, params)
-    p_obj.do_process()
+    # p_obj = ProcessTrainDataTemplate(total_re_task_data_list, params)
+    # p_obj.do_process()
     """ 训练模型 """
-    train_re_model(params, p_obj.root_dir)
+    # train_re_model(params, p_obj.root_dir)
+    """ KNN模型训练 """
+    knn_obj = KnnRetrievalTemplate(total_re_task_data_list, params)
+    search_sent_data = knn_obj.source_data_list[105]
+
+    
+    similar_sent_data = knn_obj.do_find_similar_sent(search_sent_data)  # type: List[IdentifiedReSentBaseData]
+    """ 大模型进行关系抽取 """
+    llm_re_obj = LLM_RE(params)
+    ans = llm_re_obj.do_llm_search(search_sent_data, similar_sent_data)
